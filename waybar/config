@@ -1,0 +1,109 @@
+{
+  "layer": "top",
+  "position": "top",
+    "margin": "9 13 -10 18",
+  "height": 24,
+  "spacing": 4,
+  "output": "eDP-1",
+  "modules-left": [
+    "hyprland/workspaces",
+
+    "hyprland/language",
+    "tray"
+  ],
+  "modules-center": [
+    "clock"
+  ],
+  "modules-right": [
+	"network",
+"backlight",
+  "pulseaudio",
+  "cpu",
+  "memory",
+    "battery",
+  ],
+ "hyprland/workspaces": {
+        "disable-scroll": true,
+    },
+  "hyprland/window": {
+    "max-length": 128
+  },
+  "clock": {
+    "format": "{:%a, %d %b, %H:%M}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>"
+  },
+  "hyprland/language": {
+    "format-en": "US",
+    "format-eg": "AR",
+    "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next"
+  },
+  
+    "battery": {
+    "interval": 2,
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
+        "format-icons": ["", "", "", "", "", "", "", "", "", ""],
+    },
+        "backlight": {
+        "device": "intel_backlight",
+        "reverse-scrolling": 1,
+        "format": "{percent}% {icon}",
+        "format-icons": [""],
+        "min-length": 7,
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 4
+    },
+     "pulseaudio": {
+        // "scroll-step": 1, // %, can be a float
+        "reverse-scrolling": 1,
+        "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon}",
+        "format-bluetooth-muted": " {icon}",
+        "format-muted": " {format_source}",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "min-length": 7,
+    },
+    "cpu": {
+      "interval": 2,
+      "format": "{usage}% ",
+      "min-length": 7
+    },
+    "memory": {
+	"interval": 2,
+	"format": "{used:0.1f}G ",
+	"max-length": 10,
+      "min-length": 8
+},
+"network": {
+    "interface": "wlp0s20f3",
+    "format": "{ifname}",
+    "format-wifi": "{bandwidthTotalBits} ",
+    "format-ethernet": "{ipaddr}/{cidr} 󰊗",
+    "format-disconnected": "", //An empty format will hide the module.
+    "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+    "tooltip-format-wifi": "{essid}",
+    "tooltip-format-ethernet": "{ifname} ",
+    "tooltip-format-disconnected": "Disconnected",
+    "max-length": 50,
+    "min-length": 12,
+}
+
+}
