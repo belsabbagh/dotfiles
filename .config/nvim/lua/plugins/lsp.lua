@@ -71,25 +71,25 @@ return {
         filetypes = { 'rust' },
         capabilities = capabilities,
       },
-      ts_ls = {
+      vtsls = {
         filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
-        init_options = {
-          plugins = {
-            {
-              name = '@vue/typescript-plugin',
-              location = vue_language_server_path,
-              languages = { 'javascript', 'typescript', 'vue' },
-              configNamespace = 'javascript',
-              enableForWorkspaceTypeScriptVersions = true,
+        settings = {
+          vtsls = {
+            -- autoUseWorkspaceTsdk = true,
+            tsserver = {
+              globalPlugins = {
+                {
+                  name = '@vue/typescript-plugin',
+                  location = vue_language_server_path,
+                  languages = { 'vue' },
+                  configNamespace = 'typescript',
+                  enableForWorkspaceTypeScriptVersions = true,
+                },
+              },
             },
           },
         },
-        settings = {
-          implicitProjectConfiguration = {
-            checkJs = true,
-            strictNullChecks = true,
-          },
-        },
+        capabilities = capabilities,
       },
       biome = {
         capabilities = capabilities,
@@ -98,12 +98,45 @@ return {
         filetypes = { 'php' },
         capabilities = capabilities,
       },
-      volar = {
+      vuels = {
         filetypes = { 'vue' },
         capabilities = capabilities,
         init_options = {
-          vue = {
-            hybridMode = true,
+          config = {
+            css = {},
+            emmet = {},
+            html = {
+              suggest = {},
+            },
+            javascript = {
+              format = {},
+            },
+            stylusSupremacy = {},
+            typescript = {
+              format = {},
+            },
+            vetur = {
+              completion = {
+                autoImport = false,
+                tagCasing = 'kebab',
+                useScaffoldSnippets = false,
+              },
+              format = {
+                defaultFormatter = {
+                  js = 'none',
+                  ts = 'none',
+                },
+                defaultFormatterOptions = {},
+                scriptInitialIndent = false,
+                styleInitialIndent = false,
+              },
+              useWorkspaceDependencies = false,
+              validation = {
+                script = true,
+                style = true,
+                template = true,
+              },
+            },
           },
         },
       },
