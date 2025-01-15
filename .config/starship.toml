@@ -3,7 +3,8 @@ $username\
 $hostname\
 $directory\
 $git_branch\
-$git_state $git_status\
+$git_state\
+$git_status\
 $cmd_duration\
 $line_break\
 $python\
@@ -20,7 +21,7 @@ error_symbol = "[>](bold red)"
 vimcmd_symbol = "[<](bold purple)"
 
 [git_branch]
-format = "[$branch]($style)"
+format = "[$branch]($style) "
 style = "bold pink"
 
 [git_status]
