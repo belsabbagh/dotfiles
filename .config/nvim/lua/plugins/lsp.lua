@@ -72,7 +72,7 @@ return {
         capabilities = capabilities,
       },
       vtsls = {
-        filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+        filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact' },
         settings = {
           vtsls = {
             -- autoUseWorkspaceTsdk = true,
@@ -117,9 +117,9 @@ return {
             },
             vetur = {
               completion = {
-                autoImport = false,
+                autoImport = true,
                 tagCasing = 'kebab',
-                useScaffoldSnippets = false,
+                useScaffoldSnippets = true,
               },
               format = {
                 defaultFormatter = {
