@@ -13,7 +13,7 @@ $character"""
 palette = "dracula"
 
 [directory]
-style = "blue"
+style = "green"
 
 [character]
 success_symbol = "[>](bold green)"
