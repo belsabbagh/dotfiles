@@ -16,6 +16,8 @@
     "context": "Editor",
     "bindings": {
       // "j k": ["workspace::SendKeystrokes", "escape"]
+      "g d": "editor::GoToDefinition",
+      "space c a": "editor::ToggleCodeActions"
     }
   }
 ]
