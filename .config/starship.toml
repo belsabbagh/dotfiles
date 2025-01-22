@@ -13,7 +13,7 @@ $character"""
 palette = "dracula"
 
 [directory]
-style = "green"
+style = "bold pink"
 
 [character]
 success_symbol = "[>](bold green)"
@@ -22,7 +22,7 @@ vimcmd_symbol = "[<](bold purple)"
 
 [git_branch]
 format = "[$branch]($style) "
-style = "bold pink"
+style = "bright-black"
 
 [git_status]
 style = "red"

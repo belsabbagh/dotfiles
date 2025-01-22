@@ -123,8 +123,8 @@ return {
               },
               format = {
                 defaultFormatter = {
-                  js = 'none',
-                  ts = 'none',
+                  js = 'biome',
+                  ts = 'biome',
                 },
                 defaultFormatterOptions = {},
                 scriptInitialIndent = false,
@@ -135,6 +135,11 @@ return {
                 script = true,
                 style = true,
                 template = true,
+                templateProps = true,
+                interpolation = true,
+              },
+              experimental = {
+                templateInterpolationService = true,
               },
             },
           },
