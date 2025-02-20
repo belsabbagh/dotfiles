@@ -25,6 +25,8 @@ return {
       python = { 'ruff' },
       javascript = { 'biome', 'prettier', stop_after_first = true },
       typescript = { 'biome', 'prettier', stop_after_first = true },
+      html = { 'prettier' },
+      css = { 'prettier' },
       yaml = { 'prettier' },
       rust = { 'rustfmt', lsp_format = 'fallback' },
       json = { 'biome', 'prettier', stop_after_first = true },
