@@ -31,6 +31,7 @@ return {
       rust = { 'rustfmt', lsp_format = 'fallback' },
       json = { 'biome', 'prettier', stop_after_first = true },
       vue = { 'biome', 'prettier' },
+      svelte = { 'biome', 'prettier' },
       php = { 'pint', 'intelephense', stop_after_first = true },
     },
     formatters = {

@@ -1,0 +1,5 @@
+[user]
+	email = belsabbagh@gmail.com
+	name = Belal Elsabbagh
+[core]
+	sshcommand = ssh -i /home/belal/.ssh/github_key

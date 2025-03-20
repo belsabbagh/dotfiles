@@ -113,6 +113,9 @@ return {
       biome = {
         capabilities = capabilities,
       },
+      svelte = {
+        capabilities = capabilities,
+      },
       phpactor = {
         filetypes = { 'php' },
         capabilities = capabilities,
