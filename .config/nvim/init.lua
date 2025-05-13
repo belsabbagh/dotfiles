@@ -52,6 +52,17 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
+vim.lsp.config('*', {
+  capabilities = {
+    textDocument = {
+      semanticTokens = {
+        multilineTokenSupport = true,
+      },
+    },
+  },
+  root_markers = { '.git' },
+})
+
 require('lazy').setup({ spec = { import = 'plugins' } }, {
   ui = {
     icons = vim.g.have_nerd_font and {} or {
