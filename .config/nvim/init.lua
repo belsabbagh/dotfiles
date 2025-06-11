@@ -144,6 +144,7 @@ vim.lsp.enable {
   'luals',
   'pyright',
   'ruff',
+  'julials',
   'sveltels',
   'rust-analyzer',
   'tsls',
