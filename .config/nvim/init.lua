@@ -149,4 +149,5 @@ vim.lsp.enable {
   'rust-analyzer',
   'tsls',
   'yamlls',
+  'astrols',
 }

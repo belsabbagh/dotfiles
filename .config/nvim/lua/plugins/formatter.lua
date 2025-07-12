@@ -20,7 +20,7 @@ return {
     },
     formatters_by_ft = {
       lua = { 'stylua' },
-
+      astro = { 'prettier' },
       go = { 'gofmt' },
       python = { 'ruff' },
       javascript = { 'biome', 'prettier', stop_after_first = true },
