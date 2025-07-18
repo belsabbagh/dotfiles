@@ -1,16 +1,16 @@
-#!/bin/bash
+#!/bin/zsh
 
 # --- Script Configuration for Robustness ---
-set -euo pipefail # Exit on error, unset variables, and pipe failures
-# set -x # Uncomment this line for debugging output (prints commands as they are executed)
+setopt ERR_EXIT NO_UNSET PIPE_FAIL
+# set -x # Uncomment this line for debugging output
 
-# --- FLAC to MP3 Converter (Bash Script) ---
+# --- FLAC to MP3 Converter (Zsh Script - find -exec) ---
 #
 # This script converts all FLAC files found in a specified input directory
 # and its subdirectories into MP3 files, saving them to a specified output directory
 # while preserving the original directory structure.
 #
-# Usage: ./convert_flac_to_mp3.sh <input_directory> <output_directory>
+# Usage: ./convert_flac_to_mp3_find_exec.zsh <input_directory> <output_directory>
 #
 # Arguments:
 #   <input_directory>  : The path to the directory containing FLAC files.
@@ -19,11 +19,9 @@ set -euo pipefail # Exit on error, unset variables, and pipe failures
 # Requirements:
 #   - ffmpeg: Must be installed and accessible in your system's PATH.
 #   - realpath: Must be installed and accessible in your system's PATH.
-#               (Typically part of GNU coreutils on Linux. macOS users might need `brew install coreutils`)
-#   - xargs: Standard utility, usually present.
 #
 # Example:
-#   ./convert_flac_to_mp3.sh "/home/user/music/flac albums" "/home/user/music/mp3 converted"
+#   ./convert_flac_to_mp3_find_exec.zsh "/home/user/music/flac albums" "/home/user/music/mp3 converted"
 #
 
 # Check if ffmpeg is installed
@@ -39,13 +37,6 @@ if ! command -v realpath &> /dev/null; then
     exit 1
 fi
 
-# Check if xargs is installed (should be standard, but good practice)
-if ! command -v xargs &> /dev/null; then
-    echo "Error: xargs command not found. This script requires 'xargs'."
-    echo "Please ensure xargs is installed on your system."
-    exit 1
-fi
-
 # Check for correct number of arguments
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <input_directory> <output_directory>"
@@ -54,10 +45,9 @@ if [ "$#" -ne 2 ]; then
 fi
 
 # Resolve input and output directories to their absolute, canonical paths.
-# This makes path handling consistent and robust against symbolic links or relative paths.
-# Export them so they are available in the subshell created by 'xargs'.
-export INPUT_DIR=$(realpath "$1")
-export OUTPUT_DIR=$(realpath "$2")
+export INPUT_DIR=$(realpath "$1") # Export for the subshell
+export OUTPUT_DIR=$(realpath "$2") # Export for the subshell
+export INPUT_BASENAME=$(basename "$INPUT_DIR") # Export for the subshell
 
 # Check if resolved input directory exists
 if [ ! -d "$INPUT_DIR" ]; then
@@ -66,64 +56,45 @@ if [ ! -d "$INPUT_DIR" ]; then
 fi
 
 # Create the output directory if it doesn't exist.
-# mkdir -p handles creation of parent directories and doesn't error if it already exists.
 mkdir -p "$OUTPUT_DIR"
 
-echo "Starting FLAC to MP3 conversion..."
+echo "Starting FLAC to MP3 conversion using find -exec..."
 echo "Input Directory (resolved): $INPUT_DIR"
 echo "Output Directory (resolved): $OUTPUT_DIR"
 echo "--------------------------------------------------"
 
-# Define a function to process a single FLAC file.
-# This function will be called by 'xargs' for each file found.
-convert_single_file() {
-    local FLAC_FILEPATH="$1" # The input FLAC file path passed by xargs
+# Define a helper function to be called by find -exec.
+# This function will be executed in a new subshell for each file.
+exec_convert_single_file() {
+    local FLAC_FILEPATH_CANONICAL=$(realpath "$1")
 
-    # Ensure FLAC_FILEPATH is an absolute and canonical path.
-    FLAC_FILEPATH_CANONICAL=$(realpath "$FLAC_FILEPATH")
+    local RELATIVE_PATH=$(realpath --relative-to="$INPUT_DIR" "$FLAC_FILEPATH_CANONICAL")
+    local MP3_FILENAME="${RELATIVE_PATH%.flac}.mp3"
+    local OUTPUT_FILEPATH="${OUTPUT_DIR}/${INPUT_BASENAME}/${MP3_FILENAME}"
 
-    # Calculate the relative path of the FLAC file from the input directory.
-    # realpath --relative-to is the most robust way to get this.
-    RELATIVE_PATH=$(realpath --relative-to="$INPUT_DIR" "$FLAC_FILEPATH_CANONICAL")
-
-    # Construct the output filename by replacing the .flac extension with .mp3.
-    MP3_FILENAME="${RELATIVE_PATH%.flac}.mp3"
-
-    # Construct the full output path by combining the resolved output directory
-    # with the newly calculated relative MP3 filename.
-    INPUT_BASENAME=$(basename "$INPUT_DIR")
-    OUTPUT_FILEPATH="${OUTPUT_DIR}/${INPUT_BASENAME}/${MP3_FILENAME}"
-
-    # Create the necessary subdirectory structure in the output directory.
     mkdir -p "$(dirname "$OUTPUT_FILEPATH")"
 
     echo "Converting: '$FLAC_FILEPATH_CANONICAL'"
     echo "Saving to:  '$OUTPUT_FILEPATH'"
 
-    # Execute the ffmpeg command for conversion.
-    # We suppress output to keep the main script clean, but errors will still be reported by 'set -euo pipefail'.
     ffmpeg -i "$FLAC_FILEPATH_CANONICAL" -map 0:a:0 -codec:a libmp3lame -b:a 320k -y "$OUTPUT_FILEPATH" >/dev/null 2>&1
 
-    # Check the exit status of the ffmpeg command.
     if [ $? -eq 0 ]; then
         echo "Successfully converted: '$MP3_FILENAME'"
     else
-        # If ffmpeg fails, print a more specific error message.
-        # Note: 'set -e' will cause the script to exit on the first ffmpeg failure.
-        echo "Error converting: '$FLAC_FILEPATH_CANONICAL'. Check ffmpeg output for details (remove >/dev/null 2>&1 to see)."
+        echo "Error converting: '$FLAC_FILEPATH_CANONICAL'. Check ffmpeg output for details."
+        # find -exec doesn't stop on errors by default, so we explicitly exit the subshell.
+        return 1
     fi
     echo "--------------------------------------------------"
 }
 
-# Export the function so xargs can find it.
-export -f convert_single_file
-export INPUT_DIR
-export OUTPUT_DIR
+# Export the function so `find -exec zsh -c '...'` can see it.
+export -f exec_convert_single_file
 
-# Find all .flac files recursively starting from the resolved input directory.
-# Pipe the null-delimited list of files to 'xargs -0', which then executes
-# the 'bash -c' command (which calls our defined function) for each file.
-find "$INPUT_DIR" -type f -name "*.flac" -print0 | sort -zV | xargs -0 -I {} bash -c 'convert_single_file "$@"' _ {}
+# Find all .flac files and execute the helper function for each.
+# Using `+` instead of `;` tells find to pass multiple files to a single invocation
+# of `zsh -c` if possible, which can be more efficient.
+find "$INPUT_DIR" -type f -name "*.flac" -exec zsh -c 'exec_convert_single_file "$@"' _ {} +
 
 echo "Conversion process completed."
-
