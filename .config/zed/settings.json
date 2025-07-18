@@ -12,7 +12,7 @@
   "buffer_font_size": 14,
   "theme": {
     "mode": "system",
-    "light": "Dracula",
+    "light": "Dracula Solid",
     "dark": "One Dark"
   }
 }
