@@ -1,41 +1,67 @@
-#!/bin/zsh
+#!/bin/bash
 
 # --- Script Configuration for Robustness ---
-setopt ERR_EXIT NO_UNSET PIPE_FAIL
-# set -x # Uncomment this line for debugging output
+set -euo pipefail # Exit on error, unset variables, and pipe failures
+# set -x # Uncomment this line for debugging output (prints commands as they are executed)
 
-# --- FLAC to MP3 Converter (Zsh Script - Recursive Globbing) ---
+# --- FLAC to MP3 Converter (Bash Script) ---
 #
 # This script converts all FLAC files found in a specified input directory
 # and its subdirectories into MP3 files, saving them to a specified output directory
 # while preserving the original directory structure.
 #
-# Usage: ./convert_flac_to_mp3_zsh_glob.zsh [-d|--dry-run] <input_directory> <output_directory>
+# Usage: ./convert_flac_to_mp3.sh [OPTIONS] <input_directory> <output_directory>
+#
+# Options:
+#   --dry-run      : Simulate the conversion process without actually creating
+#                    files or directories, or running ffmpeg.
 #
 # Arguments:
-#   -d, --dry-run      : Optional. If present, the script will only show what
-#                        it would do without actually performing conversions
-#                        or creating directories.
 #   <input_directory>  : The path to the directory containing FLAC files.
 #   <output_directory> : The path where the converted MP3 files will be saved.
 #
 # Requirements:
 #   - ffmpeg: Must be installed and accessible in your system's PATH.
 #   - realpath: Must be installed and accessible in your system's PATH.
+#               (Typically part of GNU coreutils on Linux. macOS users might need `brew install coreutils`)
+#   - xargs: Standard utility, usually present.
 #
 # Example:
-#   ./convert_flac_to_mp3_zsh_glob.zsh "/home/user/music/flac albums" "/home/user/music/mp3 converted"
-#   ./convert_flac_to_mp3_zsh_glob.zsh --dry-run "/home/user/music/flac albums" "/home/user/music/mp3 converted"
-#
+#   ./convert_flac_to_mp3.sh "/home/user/music/flac albums" "/home/user/music/mp3 converted"
+#   ./convert_flac_to_mp3.sh --dry-run "/home/user/music/flac albums" "/home/user/music/mp3 converted"
 
-# Initialize dry run flag
-local DRY_RUN=false
+# --- Global Variables ---
+DRY_RUN=false # Default to false, set to true if --dry-run is present
 
-# Parse arguments
-# Check for dry run flag
-if [[ "$1" == "-d" || "$1" == "--dry-run" ]]; then
+# --- Function to display usage information ---
+usage() {
+    echo "Usage: $0 [OPTIONS] <input_directory> <output_directory>"
+    echo "Convert FLAC files to MP3 format, preserving directory structure."
+    echo ""
+    echo "Options:"
+    echo "  --dry-run      : Simulate the conversion process without actually creating"
+    echo "                   files or directories, or running ffmpeg."
+    echo ""
+    echo "Arguments:"
+    echo "  <input_directory>  : The path to the directory containing FLAC files."
+    echo "  <output_directory> : The path where the converted MP3 files will be saved."
+    echo ""
+    echo "Example:"
+    echo "  $0 /path/to/flac_files /path/to/mp3_output"
+    echo "  $0 --dry-run /path/to/flac_files /path/to/mp3_output"
+    exit 1
+}
+
+# --- Parse Command Line Arguments ---
+# Check for --dry-run flag
+if [[ "$#" -ge 1 && "$1" == "--dry-run" ]]; then
     DRY_RUN=true
-    shift # Remove the flag from the arguments list
+    shift # Remove --dry-run from the arguments list
+fi
+
+# Check for correct number of remaining arguments
+if [ "$#" -ne 2 ]; then
+    usage
 fi
 
 # Check if ffmpeg is installed
@@ -51,18 +77,18 @@ if ! command -v realpath &> /dev/null; then
     exit 1
 fi
 
-# Check for correct number of remaining arguments
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 [-d|--dry-run] <input_directory> <output_directory>"
-    echo "Example: $0 /path/to/flac_files /path/to/mp3_output"
-    echo "Example (Dry Run): $0 --dry-run /path/to/flac_files /path/to/mp3_output"
+# Check if xargs is installed (should be standard, but good practice)
+if ! command -v xargs &> /dev/null; then
+    echo "Error: xargs command not found. This script requires 'xargs'."
+    echo "Please ensure xargs is installed on your system."
     exit 1
 fi
 
 # Resolve input and output directories to their absolute, canonical paths.
-local INPUT_DIR=$(realpath "$1")
-local OUTPUT_DIR=$(realpath "$2")
-local INPUT_BASENAME=$(basename "$INPUT_DIR") # Base name of the input directory
+# This makes path handling consistent and robust against symbolic links or relative paths.
+# Export them so they are available in the subshell created by 'xargs'.
+export INPUT_DIR=$(realpath "$1")
+export OUTPUT_DIR=$(realpath "$2")
 
 # Check if resolved input directory exists
 if [ ! -d "$INPUT_DIR" ]; then
@@ -70,66 +96,88 @@ if [ ! -d "$INPUT_DIR" ]; then
     exit 1
 fi
 
-# Create the output directory if it doesn't exist (only if not in dry run mode).
-if $DRY_RUN; then
-    echo "Dry Run: Would create output base directory '$OUTPUT_DIR' if it didn't exist."
+# Create the output directory if it doesn't exist.
+# mkdir -p handles creation of parent directories and doesn't error if it already exists.
+if [ "$DRY_RUN" = true ]; then
+    echo "Dry run: Would create output directory if it didn't exist: '$OUTPUT_DIR'"
 else
     mkdir -p "$OUTPUT_DIR"
 fi
 
-echo "Starting FLAC to MP3 conversion using Zsh globbing..."
+
+echo "Starting FLAC to MP3 conversion..."
+if [ "$DRY_RUN" = true ]; then
+    echo "*** DRY RUN MODE ENABLED *** No actual files will be created or modified."
+fi
 echo "Input Directory (resolved): $INPUT_DIR"
 echo "Output Directory (resolved): $OUTPUT_DIR"
-if $DRY_RUN; then
-    echo "--- DRY RUN MODE ACTIVE --- No files will be converted or directories created."
-fi
 echo "--------------------------------------------------"
 
-# Enable recursive globbing (globstar) and nullglob (handle no matches gracefully)
-setopt GLOBSTAR NULL_GLOB
+# Define a function to process a single FLAC file.
+# This function will be called by 'xargs' for each file found.
+convert_single_file() {
+    local FLAC_FILEPATH="$1" # The input FLAC file path passed by xargs
 
-# Loop through all FLAC files found recursively
-for FLAC_FILEPATH_CANONICAL in "${INPUT_DIR}"/**/*.flac; do
-    # Skip if the glob found no files (due to NULL_GLOB)
-    [[ -e "$FLAC_FILEPATH_CANONICAL" ]] || continue
+    # Ensure FLAC_FILEPATH is an absolute and canonical path.
+    FLAC_FILEPATH_CANONICAL=$(realpath "$FLAC_FILEPATH")
 
     # Calculate the relative path of the FLAC file from the input directory.
+    # realpath --relative-to is the most robust way to get this.
     RELATIVE_PATH=$(realpath --relative-to="$INPUT_DIR" "$FLAC_FILEPATH_CANONICAL")
 
     # Construct the output filename by replacing the .flac extension with .mp3.
     MP3_FILENAME="${RELATIVE_PATH%.flac}.mp3"
 
-    # Construct the full output path
-    OUTPUT_FILEPATH="${OUTPUT_DIR}/${INPUT_BASENAME}/${MP3_FILENAME}"
-
-    # Create the necessary subdirectory structure in the output directory (only if not in dry run mode).
-    local OUTPUT_SUBDIR="$(dirname "$OUTPUT_FILEPATH")"
-    if $DRY_RUN; then
-        echo "Dry Run: Would create directory: '$OUTPUT_SUBDIR'"
-    else
-        mkdir -p "$OUTPUT_SUBDIR"
-    fi
+    # Construct the full output path by combining the resolved output directory
+    # with the newly calculated relative MP3 filename.
+    # The original script had an extra "$INPUT_BASENAME/" in the path,
+    # which would create a redundant directory under OUTPUT_DIR.
+    # Changed from: OUTPUT_FILEPATH="${OUTPUT_DIR}/${INPUT_BASENAME}/${MP3_FILENAME}"
+    # To:
+    OUTPUT_FILEPATH="${OUTPUT_DIR}/${MP3_FILENAME}"
 
     echo "Processing: '$FLAC_FILEPATH_CANONICAL'"
-    echo "Target MP3: '$OUTPUT_FILEPATH'"
+    echo "Would save to:  '$OUTPUT_FILEPATH'"
 
-    if $DRY_RUN; then
-        echo "Dry Run: Would convert '$FLAC_FILEPATH_CANONICAL' to '$OUTPUT_FILEPATH'"
+    # Create the necessary subdirectory structure in the output directory.
+    if [ "$DRY_RUN" = true ]; then
+        echo "Dry run: Would create directory: '$(dirname "$OUTPUT_FILEPATH")'"
     else
-        # Perform the conversion
+        mkdir -p "$(dirname "$OUTPUT_FILEPATH")"
+    fi
+
+    # Execute the ffmpeg command for conversion.
+    # We suppress output to keep the main script clean, but errors will still be reported by 'set -euo pipefail'.
+    if [ "$DRY_RUN" = true ]; then
+        echo "Dry run: Would execute ffmpeg command:"
+        echo "ffmpeg -i \"$FLAC_FILEPATH_CANONICAL\" -map 0:a:0 -codec:a libmp3lame -b:a 320k -y \"$OUTPUT_FILEPATH\""
+    else
         ffmpeg -i "$FLAC_FILEPATH_CANONICAL" -map 0:a:0 -codec:a libmp3lame -b:a 320k -y "$OUTPUT_FILEPATH" >/dev/null 2>&1
 
+        # Check the exit status of the ffmpeg command.
         if [ $? -eq 0 ]; then
             echo "Successfully converted: '$MP3_FILENAME'"
         else
-            echo "Error converting: '$FLAC_FILEPATH_CANONICAL'. Check ffmpeg output for details."
+            # If ffmpeg fails, print a more specific error message.
+            # Note: 'set -e' will cause the script to exit on the first ffmpeg failure.
+            echo "Error converting: '$FLAC_FILEPATH_CANONICAL'. Check ffmpeg output for details (remove >/dev/null 2>&1 to see)."
         fi
     fi
     echo "--------------------------------------------------"
-done
+}
+
+# Export the function so xargs can find it.
+export -f convert_single_file
+export INPUT_DIR
+export OUTPUT_DIR
+export DRY_RUN # Export DRY_RUN so the function can access it
+
+# Find all .flac files recursively starting from the resolved input directory.
+# Pipe the null-delimited list of files to 'xargs -0', which then executes
+# the 'bash -c' command (which calls our defined function) for each file.
+find "$INPUT_DIR" -type f -name "*.flac" -print0 | sort -zV | xargs -0 -I {} bash -c 'convert_single_file "$@"' _ {}
 
 echo "Conversion process completed."
-if $DRY_RUN; then
-    echo "Remember: This was a DRY RUN. No actual files were converted or directories created."
+if [ "$DRY_RUN" = true ]; then
+    echo "This was a DRY RUN. No files were actually converted or created."
 fi
-
