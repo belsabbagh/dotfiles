@@ -15,6 +15,15 @@ return {
       runtime = {
         version = 'LuaJIT',
       },
+      diagnostics = {
+        globals = { 'vim' }, -- Add 'vim' to the list of global variables
+      },
+      workspace = {
+        library = {
+          vim.env.VIMRUNTIME, -- Include Neovim's runtime files for better completion
+          -- Add other library paths if needed, e.g., for plugins
+        },
+      },
     },
   },
 }
