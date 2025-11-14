@@ -32,7 +32,7 @@ return {
       json = { 'biome', 'prettier', stop_after_first = true },
       vue = { 'biome', 'prettier' },
       svelte = { 'biome', 'prettier', stop_after_first = true },
-      php = { 'pint', 'intelephense', stop_after_first = true },
+      php = { 'pint', stop_after_first = true },
     },
     formatters = {
       biome = {
@@ -70,10 +70,6 @@ return {
           }
         end,
         stdin = true,
-      },
-      intelephense = {
-        command = 'intelephense',
-        args = {},
       },
     },
   },
