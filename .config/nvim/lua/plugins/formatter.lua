@@ -4,19 +4,24 @@ return {
   cmd = { 'ConformInfo' },
   keys = {
     {
-      '<leader>cf',
+      -- Customize or remove this keymap to your liking
+      '<leader>f',
       function()
-        require('conform').format { async = true, lsp_format = 'fallback' }
+        require('conform').format { async = true }
       end,
       mode = '',
-      desc = '[C]ode [F]ormat',
+      desc = 'Format buffer',
     },
   },
+  -- This will provide type hinting with LuaLS
+  ---@module "conform"
+  ---@type conform.setupOpts
   opts = {
     notify_on_error = true,
     format_on_save = {
       -- These options will be passed to conform.format()
       timeout_ms = 1000,
+      lsp_format = 'fallback',
     },
     formatters_by_ft = {
       lua = { 'stylua' },

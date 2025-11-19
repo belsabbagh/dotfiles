@@ -19,9 +19,11 @@ return {
         globals = { 'vim' }, -- Add 'vim' to the list of global variables
       },
       workspace = {
+        checkThirdParty = true,
         library = {
-          vim.env.VIMRUNTIME, -- Include Neovim's runtime files for better completion
-          -- Add other library paths if needed, e.g., for plugins
+          vim.env.VIMRUNTIME,
+          '$XDG_DATA_HOME/nvim/lazy',
+          '${3rd}/luv/library',
         },
       },
     },
