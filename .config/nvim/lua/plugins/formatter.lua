@@ -26,7 +26,7 @@ return {
     formatters_by_ft = {
       lua = { 'stylua' },
       go = { 'gofmt' },
-      python = { 'ruff' },
+      python = { 'ruff', "black", stop_after_first = true},
       javascript = { 'biome', 'prettier', stop_after_first = true },
       typescript = { 'biome', 'prettier', stop_after_first = true },
       html = { 'biome', 'prettier', stop_after_first = true },
