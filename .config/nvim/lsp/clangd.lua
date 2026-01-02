@@ -6,7 +6,7 @@ return {
   root_markers = { '.clangd', 'compile_commands.json' },
   -- From the clangd configuration in init.lua
   -- Overrides the clangd configuration in <rtp>/lsp/clangd.lua
-  filetypes = { 'c' },
+  filetypes = { 'c', 'cpp' },
   -- From the "*" configuration in init.lua
   capabilities = {
     textDocument = {
