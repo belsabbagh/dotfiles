@@ -198,6 +198,7 @@ vim.lsp.enable {
   'svelte-language-server',
   'rust-analyzer',
   'emmet-language-server',
+  'tsgo',
   'tsls',
   'yamlls',
   'astrols',
