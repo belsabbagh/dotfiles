@@ -91,6 +91,7 @@ return {
   cmd = { 'typescript-language-server', '--stdio' },
   filetypes = {
     'astro',
+    'vue',
   },
   root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' },
   handlers = {
