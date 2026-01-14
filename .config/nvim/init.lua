@@ -189,10 +189,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 vim.lsp.enable {
+  'astrols',
+  'bashls',
   'clangd',
   'gopls',
   'luals',
-  'pyright',
+  -- 'pyright',
   'ruff',
   'julials',
   'svelte-language-server',
@@ -201,7 +203,5 @@ vim.lsp.enable {
   'tsgo',
   'tsls',
   'yamlls',
-  'astrols',
-  'bashls',
   'ty',
 }
