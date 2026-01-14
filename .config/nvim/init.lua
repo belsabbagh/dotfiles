@@ -203,4 +203,5 @@ vim.lsp.enable {
   'yamlls',
   'astrols',
   'bashls',
+  'ty',
 }
