@@ -205,3 +205,6 @@ vim.lsp.enable {
   'yamlls',
   'ty',
 }
+
+vim.o.background = "dark"
+vim.cmd([[colorscheme gruvbox-material]])
