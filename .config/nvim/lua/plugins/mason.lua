@@ -1,18 +1,12 @@
 return {
-  'williamboman/mason.nvim',
+  'mason-org/mason.nvim',
   opts = {
-    ensure_installed = {
-      'typescript-language-server',
-      'biome',
-      'svelte-language-server',
-      'vue-language-server',
-      'gopls',
-      'rust-analyzer',
-      'stylua',
-      'html-lsp',
-      'ruff',
-      'mypy',
-      'pyright',
-    },
+    ui = {
+            icons = {
+                package_installed = "✓",
+                package_pending = "➜",
+                package_uninstalled = "✗"
+            }
+    }
   },
 }
