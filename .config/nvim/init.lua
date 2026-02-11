@@ -216,5 +216,5 @@ vim.lsp.enable {
   'ty',
 }
 
-vim.o.background = "dark"
-vim.cmd([[colorscheme gruvbox-material]])
+vim.o.background = 'dark'
+vim.cmd [[colorscheme gruvbox-material]]
