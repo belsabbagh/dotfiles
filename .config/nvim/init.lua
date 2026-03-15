@@ -20,7 +20,6 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 -- vim.opt.textwidth = 80
-
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
@@ -210,11 +209,13 @@ vim.lsp.enable {
   'svelte-language-server',
   'rust-analyzer',
   'emmet-language-server',
+  'tinymist',
   'tsgo',
   'tsls',
+  'qmlls',
   'yamlls',
   'ty',
 }
 
 vim.o.background = 'dark'
-vim.cmd [[colorscheme gruvbox-material]]
+vim.cmd [[colorscheme gruvbox]]

@@ -26,18 +26,19 @@ return {
     formatters_by_ft = {
       lua = { 'stylua' },
       go = { 'gofmt' },
-      python = { 'ruff', "black", stop_after_first = true},
+      python = { 'ruff', 'black', stop_after_first = true },
       javascript = { 'biome', 'prettier', stop_after_first = true },
       typescript = { 'biome', 'prettier', stop_after_first = true },
-      html = { 'biome', 'prettier', stop_after_first = true },
+      html = { 'prettier', stop_after_first = true },
       css = { 'biome', 'prettier', stop_after_first = true },
       rust = { 'rustfmt', lsp_format = 'fallback' },
       json = { 'biome', 'prettier', stop_after_first = true },
-      astro = { 'biome', 'prettier', stop_after_first = true },
+      astro = { 'prettier', 'biome', stop_after_first = true },
       vue = { 'biome', 'prettier' },
-      svelte = { 'biome', 'prettier', stop_after_first = true },
+      svelte = { 'prettier', 'biome', stop_after_first = true },
       yaml = { 'prettier' },
       php = { 'pint', stop_after_first = true },
+      typst = { 'typstyle', stop_after_first = true },
     },
     formatters = {
       biome = {
