@@ -40,43 +40,5 @@ return {
       php = { 'pint', stop_after_first = true },
       typst = { 'typstyle', stop_after_first = true },
     },
-    formatters = {
-      biome = {
-        meta = {
-          url = 'https://github.com/biomejs/biome',
-          description = 'A toolchain for web projects, aimed to provide functionalities to maintain them.',
-        },
-        command = 'biome',
-        stdin = true,
-        args = { 'format', '--stdin-file-path', '$FILENAME' },
-      },
-      ---@type conform.FileFormatterConfig
-      ruff = {
-        meta = {
-          url = 'https://docs.astral.sh/ruff/',
-          description = 'An extremely fast Python linter, written in Rust. Formatter subcommand.',
-        },
-        command = 'ruff',
-        args = {
-          'format',
-          '--force-exclude',
-          '--stdin-filename',
-          '$FILENAME',
-          '-',
-        },
-        range_args = function(self, ctx)
-          return {
-            'format',
-            '--force-exclude',
-            '--range',
-            string.format('%d:%d-%d:%d', ctx.range.start[1], ctx.range.start[2] + 1, ctx.range['end'][1], ctx.range['end'][2] + 1),
-            '--stdin-filename',
-            '$FILENAME',
-            '-',
-          }
-        end,
-        stdin = true,
-      },
-    },
   },
 }
