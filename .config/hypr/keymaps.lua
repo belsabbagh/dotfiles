@@ -34,10 +34,22 @@ hl.bind(mainMod .. " + SHIFT + up", hl.dsp.window.swap({ direction = "u" }))
 hl.bind(mainMod .. " + SHIFT + down", hl.dsp.window.swap({ direction = "d" }))
 
 -- Resize windows with mainMod + CTRL + arrow keys
-hl.bind(mainMod .. " + CTRL + left", hl.dsp.window.resize({ x = -60, y = 0 }))
-hl.bind(mainMod .. " + CTRL + right", hl.dsp.window.resize({ x = 60, y = 0 }))
-hl.bind(mainMod .. " + CTRL + up", hl.dsp.window.resize({ x = 0, y = -60 }))
-hl.bind(mainMod .. " + CTRL + down", hl.dsp.window.resize({ x = 0, y = 60 }))
+hl.bind(
+	mainMod .. " + CTRL + left",
+	hl.dsp.window.resize({ x = -60, y = 0, relative = true })
+)
+hl.bind(
+	mainMod .. " + CTRL + right",
+	hl.dsp.window.resize({ x = 60, y = 0, relative = true })
+)
+hl.bind(
+	mainMod .. " + CTRL + up",
+	hl.dsp.window.resize({ x = 0, y = -60, relative = true })
+)
+hl.bind(
+	mainMod .. " + CTRL + down",
+	hl.dsp.window.resize({ x = 0, y = 60, relative = true })
+)
 
 -- Switch / move workspaces with mainMod + [0-9]
 for i = 1, 10 do
@@ -45,7 +57,7 @@ for i = 1, 10 do
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
 	hl.bind(
 		mainMod .. " + SHIFT + " .. key,
-		hl.dsp.window.move({ workspace = i, silent = true })
+		hl.dsp.window.move({ workspace = i, follow = false })
 	)
 end
 
