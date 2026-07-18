@@ -23,7 +23,7 @@ echo "--- Hyprland Startup: $(date) ---"
 run_and_time qs -c caelestia
 # run_and_time systemctl --user start hyprpaper
 # run_and_time systemctl --user start hypridle
-# run_and_time systemctl --user start hyprpolkitagent
+run_and_time systemctl --user start hyprpolkitagent
 run_and_time systemctl --user start xdg-desktop-portal-hyprland
 run_and_time ssh-agent
 run_and_time copyq
