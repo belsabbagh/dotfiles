@@ -1,5 +1,5 @@
 -- Keybindings
-local terminal = "alacritty"
+local terminal = "ghostty"
 local fileManager = "dolphin"
 local menu = "wofi --show drun"
 local browser = "zen-browser"
