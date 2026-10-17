@@ -1,0 +1,25 @@
+# Ghostty config, mirrors .config/alacritty/alacritty.toml
+
+# Theme (custom file in ./themes, exact copy of the alacritty gruvbox_material palette)
+theme = gruvbox_material
+# Other themes used in alacritty are available as ghostty built-ins:
+#   theme = Dracula
+#   theme = Kanagawa Dragon
+
+# Font
+font-family = JetBrainsMono Nerd Font
+font-size = 11
+
+# Window
+window-decoration = none
+window-padding-x = 2
+window-padding-y = 2
+window-width = 80
+window-height = 24
+maximize = true
+
+# Selection
+copy-on-select = clipboard
+
+# Environment
+term = xterm-256color
